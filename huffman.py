@@ -1,7 +1,4 @@
-class Codigo :
-    def __init__(self, letra, peso):
-        self.letra = letra
-        self.peso = peso
+from codigo import Codigo
 
 class Tree:
     def __init__(self, codigo, left=None, right= None):
@@ -138,5 +135,3 @@ else:
 decodificar=input("Ensira o codigo para ser decodificado: ")
 decodificado=decodificacao(root, decodificar)
 print(decodificado)
-
-root.printEscada()
