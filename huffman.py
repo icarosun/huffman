@@ -1,18 +1,6 @@
 from codigo import Codigo
 from tree import Tree
 
-def printTree(tree):
-    if tree == None : return
-    printTree(tree.left)
-    printTree(tree.right)
-    print(tree.codigo.letra)    
-
-def printTreeIndented(tree, level=0) :
-  if tree == None : return
-  printTreeIndented(tree.right, level+1)
-  print('  '*level + (tree.codigo.letra))
-  printTreeIndented(tree.left, level+1)
-
 def compressao(tree, mensagem):
     compressao= ""
     for letra in mensagem:
