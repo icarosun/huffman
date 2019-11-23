@@ -1,10 +1,5 @@
 from codigo import Codigo
-
-class Tree:
-    def __init__(self, codigo, left=None, right= None):
-        self.codigo=codigo
-        self.left=left
-        self.right=right
+from tree import Tree
 
 def printTree(tree):
     if tree == None : return
