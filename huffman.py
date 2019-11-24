@@ -118,3 +118,4 @@ else:
 decodificar=input("Ensira o codigo para ser decodificado: ")
 decodificado=decodificacao(root, decodificar)
 print(decodificado)
+print(texto)
