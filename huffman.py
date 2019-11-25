@@ -51,7 +51,7 @@ def decodificacao(tree, codigo):
     return decodificado
 
 def newTabelaTxt(texto):
-    alfabeto= [0]*128
+    alfabeto=[0]*128
     tabela = []
     for i in texto:
         alfabeto[ord(i)] +=1
