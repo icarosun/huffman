@@ -41,8 +41,8 @@ SAIR - 0
     MENU
 
 GERAR NOVA ARVORE - 3
-COMPRIMIR - 2
-DESCOMPRIMIR - 1
+CODIFICAR - 2
+DECODIFICAR - 1
 SAIR - 0
                 """)
             menu = int(input("Escolha: "))
