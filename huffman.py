@@ -50,72 +50,55 @@ def decodificacao(tree, codigo):
                     newTree=tree
     return decodificado
 
-alfabeto= [0]*128
+def newTabelaTxt(texto):
+    alfabeto= [0]*128
+    tabela = []
+    for i in texto:
+        alfabeto[ord(i)] +=1
+    soma=0
+    for i,x in enumerate(alfabeto):
+        if x != 0:
+            frequencia=Codigo(chr(i), x)
+            tree=Tree(frequencia)
+            tabela.append(tree)
+            del(frequencia)
+            del(tree)
+            soma+=x
+    for tree in tabela:
+        tree.codigo.peso=tree.codigo.peso/soma
+    return treeHuffman(tabela)
 
-tabela = []
+def treeHuffman(tabela):
+    tabela = sorted(tabela, key = lambda x: x.codigo.peso)
+    while(len(tabela)>1):
+        tree0=tabela[0].codigo
+        tree1=tabela[1].codigo
+        novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
+        novoPeso=tree0.peso+tree1.peso
+        root= Tree(Codigo(novaLetra, novoPeso), tabela[0], tabela[1])
+        for i in range(2): tabela.pop(0)
+        tabela.append(root)
+        del(tree0)
+        del(tree1)
+        del(novaLetra)
+        del(novoPeso)
+        del(root)
+        tabela = sorted(tabela, key = lambda x: x.codigo.peso)
+    return tabela[0]
 
-#texto=input("Entre com o texto: ")
-
-texto = "a"*20 + "b"*9 + "c"*15 + "d"*11 + "e"*40 + "f"*5 
-
-for i in texto:
-    alfabeto[ord(i)] +=1
-
-soma=0
-for i,x in enumerate(alfabeto):
-    if x != 0:
-        frequencia=Codigo(chr(i), x)
+def newTabela(palavra):
+    lista=palavra.split(",")
+    tabela=[]
+    soma=0
+    while(len(lista)>0):
+        soma+=int(lista[1])
+        frequencia=Codigo(lista[0], int(lista[1]))
         tree=Tree(frequencia)
         tabela.append(tree)
         del(frequencia)
         del(tree)
-        soma+=x
-        
-for tree in tabela:
-    tree.codigo.peso=tree.codigo.peso/soma
-
-#for tree in tabela:
-#    print(tree.codigo.letra, " | ", tree.codigo.peso)
-
-tabela = sorted(tabela, key = lambda x: x.codigo.peso)
-
-#print("-"*10)
-#for tree in tabela:
-#    print(tree.codigo.letra, " | ", tree.codigo.peso)
-
-maiorEsquerda = True
-while(len(tabela)>1):
-    tree0=tabela[0].codigo
-    tree1=tabela[1].codigo
-    if maiorEsquerda:
-        novaLetra= "(" + tree1.letra +  "," +  tree0.letra +  ")"
-        novoPeso=tree0.peso+tree1.peso
-        root= Tree(Codigo(novaLetra, novoPeso), tabela[1], tabela[0])
-        maiorEsquerda = False
-    else:
-        novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
-        novoPeso=tree0.peso+tree1.peso
-        root= Tree(Codigo(novaLetra, novoPeso), tabela[0], tabela[1])
-        maiorEsquerda = True
-    for i in range(2): tabela.pop(0)
-    tabela.append(root)
-    del(tree0)
-    del(tree1)
-    del(novaLetra)
-    del(novoPeso)
-    del(root)
-    tabela = sorted(tabela, key = lambda x: x.codigo.peso)
-
-root=tabela[0]
-print(root.codigo.letra)
-print("Arvore gerada!")
-codificar=input("Ensira o texto que deseja codificar: ")
-comprimido=compressao(root, codificar)
-if(comprimido == -1):
-    print("Error")
-else:
-    print(comprimido)
-decodificar=input("Ensira o codigo para ser decodificado: ")
-decodificado=decodificacao(root, decodificar)
-print(decodificado)
-print(texto)
+        for i in range(2): lista.pop(0)
+    for tree in tabela:
+        tree.codigo.peso = tree.codigo.peso/soma
+    return treeHuffman(tabela)
+    
