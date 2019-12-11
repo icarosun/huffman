@@ -101,4 +101,135 @@ def newTabela(palavra):
     for tree in tabela:
         tree.codigo.peso = tree.codigo.peso/soma
     return treeHuffman(tabela)
+
+def printarHuffman(tree, lista, top, vector):
+    if(tree.left != None):
+        lista[top]= "0"
+        printarHuffman(tree.left, lista, top+1, vector)
+
+    if(tree.right != None):
+        lista[top]="1"
+        printarHuffman(tree.right, lista, top+1, vector)
     
+    if(tree.left == None and tree.right == None):
+        printArr(tree.codigo.letra,lista, top, vector)
+
+def printArr(codigo, lista, top, vetor):
+    binario=""
+    for i in range(top):
+        binario+=lista[i]
+    tupla=codigo + " " + binario
+    vetor.append(tupla)
+
+def tabelaCodigo():
+    huffmanComp=dict()
+    huffmanDesc=dict()
+    tam=int(input("Insira o tamanho da tabela: "))
+    for i in range(0, tam):
+        letra=input("Insira a letra: ")
+        codigo=input("Insira o respectivo codigo: ")
+        huffmanComp[letra]= codigo
+        huffmanDesc[codigo]=letra
+    opcao=-1
+    while(opcao!=0):
+        print("""
+            1-comprimir
+            2-descomprimir
+
+            0-Sair
+         """)
+        opcao=int(input("Escolha uma opcao: "))
+        if opcao == 1:
+            saida=[]
+            texto=input("Entre com a mensagem: ")
+            for i in texto:
+                saida.append(huffmanComp[i])
+            saida = "".join(saida)
+            print(saida)
+            arquivo=open("comprimir.txt", "w")
+            arquivo.write(saida)
+            arquivo.close()
+        elif(opcao == 2):
+            saida=[]
+            texto=leitura ()
+            palavra=""
+            print(texto)
+            indice=0
+            while(indice < len(texto)):
+                palavra+=texto[indice]
+                if palavra in huffmanDesc:
+                    saida.append(huffmanDesc[palavra])
+                    palavra=""
+                indice+=1
+            saida= "".join(saida)
+            print(saida)
+            arquivo=open("descomprimir.txt", "w")
+            arquivo.write(saida)
+            arquivo.close()
+        else:
+            print("Saindo")
+
+def leitura():
+    nomeTxt = input("Insira o nome do arquivo em txt: ")
+    arquivo=open(nomeTxt)
+    l=arquivo.readlines()
+    print(l)
+    arquivo.close()
+    l="".join(l)
+    return l
+
+def ler():
+    huffmanComp=dict()
+    huffmanDesc=dict()
+    nomeTxt="entrada_top.txt"
+    arquivo= open(nomeTxt)
+    for i,x in enumerate(arquivo.readlines()):
+        if(i == 0):
+            texto=x.split()
+        else:
+            l=x.split()
+            if(len(l)>1):
+                letra=l[1]
+                codigo=l[0]
+                huffmanComp[letra]= codigo
+                huffmanDesc[codigo]=letra
+            else:
+                codigo=l[0]
+                huffmanComp[" "]= codigo
+                huffmanDesc[codigo]=" "
+    texto="".join(texto)
+    opcao=-1
+    while(opcao!=0):
+        print("""
+            1-comprimir
+            2-descomprimir
+
+            0-Sair
+         """)
+        opcao=int(input("Escolha uma opcao: "))
+        if opcao == 1:
+            saida=[]
+            for i in texto:
+                saida.append(huffmanComp[i])
+            saida = "".join(saida)
+            print(saida)
+            arquivo=open("comprimir.txt", "w")
+            arquivo.write(saida)
+            arquivo.close()
+        elif(opcao == 2):
+            saida=[]
+            palavra=""
+            indice=0
+            while(indice < len(texto)):
+                palavra+=texto[indice]
+                if palavra in huffmanDesc:
+                    saida.append(huffmanDesc[palavra])
+                    palavra=""
+                indice+=1
+            saida= "".join(saida)
+            print(saida)
+            arquivo=open("descomprimir.txt", "w")
+            arquivo.write(saida)
+            arquivo.close()
+        else:
+            print("Saindo")
