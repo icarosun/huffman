@@ -6,14 +6,16 @@ class Huffman:
         self.compressao=dict()
         self.descompressao=dict()
         self.tabela=[]
+        self.texto=""
 
     def analisarFrequencia(self, nomeArquivo):
         alfabeto=[0]*128
         arquivo=open(nomeArquivo)
-        texto=arquivo.readlines()
+        linha=arquivo.readlines()
         arquivo.close()
         tabelaPeso = []
-        for i in texto:
+        self.texto = "".join(linha)
+        for i in self.texto:
             alfabeto[ord(i)] +=1
         soma=0
         for i,x in enumerate(alfabeto):
@@ -26,30 +28,28 @@ class Huffman:
                 soma+=x
         for tree in tabelaPeso:
             tree.codigo.peso=tree.codigo.peso/soma
-        root=geraArvore(tabelaPeso)
+        root=self.geraArvore(tabelaPeso)
         huffman=Huffman()
         array=[0]*128
-        self.gerarTabela(root, array, 0, huffman.tabela)
-        for x in huffman.tabela:
-            print(x)
-        return huffman
+        self.gerarTabela(root, array, 0, self.tabela)
+        self.gerarEstruturas()
 
     def geraArvore(self,pesos):
         pesos = sorted(pesos, key = lambda x: x.codigo.peso)
-        esquerdaMenor=True
+        esquerdaMaior=True
         while(len(pesos)>1):
             tree0=pesos[0].codigo
             tree1=pesos[1].codigo
-            if esquerdaMenor:
-                novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
-                novoPeso=tree0.peso+tree1.peso
-                root= Tree(Codigo(novaLetra, novoPeso), pesos[0], pesos[1])
-                esquerdaMenor=False
-            else:
+            if esquerdaMaior:
                 novaLetra= "(" + tree1.letra +  "," +  tree0.letra +  ")"
                 novoPeso=tree0.peso+tree1.peso
                 root= Tree(Codigo(novaLetra, novoPeso), pesos[1], pesos[0])
-                esquerdaMenor=True
+                esquerdaMaior=False
+            else:
+                novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
+                novoPeso=tree0.peso+tree1.peso
+                root= Tree(Codigo(novaLetra, novoPeso), pesos[0], pesos[1])
+                esquerdaMaior=True
             for i in range(2): pesos.pop(0)
             pesos.append(root)
             del(tree0)
@@ -74,244 +74,57 @@ class Huffman:
 
     def gerarTupla(self,codigo, caminho, tamanho, vetor):
         binario=""
-        for i in range(top):
+        for i in range(tamanho):
             binario+=caminho[i]
         tupla=codigo + " " + binario
         vetor.append(tupla)
 
-huffman= Huffman()
-
-"""
-def compressao(tree, mensagem):
-    compressao= ""
-    for letra in mensagem:
-        if letra in tree.codigo.letra:
-            newTree=tree
-            chave=""
-            while(letra != newTree.codigo.letra):
-                esquerda=newTree.left
-                direita=newTree.right
-                if(letra == esquerda.codigo.letra):
-                    chave+="0"
-                    newTree=esquerda
-                elif(letra in esquerda.codigo.letra):
-                    chave+="0"
-                    newTree=esquerda
-                elif(letra == direita.codigo.letra):
-                    chave+="1"
-                    newTree=direita
-                else:
-                    chave+="1"
-                    newTree=direita
-            del(direita)                
-            del(esquerda)
-            del(newTree)
-            compressao+=chave
-        else:
-            return -1
-    return compressao
-
-def decodificacao(tree, codigo):
-    decodificado=""
-    newTree=tree
-    for bit in codigo:
-        if(newTree.left == None and newTree.right == None):
-            decodificado+=newTree.codigo.letra
-            newTree=tree
-        else:
-            if bit == "0":
-                newTree=newTree.left
-                if(newTree.left == None and newTree.right == None):
-                    decodificado+=newTree.codigo.letra
-                    newTree=tree
-            else:
-                newTree=newTree.right
-                if(newTree.left == None and newTree.right == None):
-                    decodificado+=newTree.codigo.letra
-                    newTree=tree
-    return decodificado
-
-def newTabelaTxt(texto):
-    alfabeto=[0]*128
-    tabela = []
-    for i in texto:
-        alfabeto[ord(i)] +=1
-    soma=0
-    for i,x in enumerate(alfabeto):
-        if x != 0:
-            frequencia=Codigo(chr(i), x)
-            tree=Tree(frequencia)
-            tabela.append(tree)
-            del(frequencia)
-            del(tree)
-            soma+=x
-    for tree in tabela:
-        tree.codigo.peso=tree.codigo.peso/soma
-    return treeHuffman(tabela)
-
-def treeHuffman(tabela):
-    tabela = sorted(tabela, key = lambda x: x.codigo.peso)
-    while(len(tabela)>1):
-        tree0=tabela[0].codigo
-        tree1=tabela[1].codigo
-        novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
-        novoPeso=tree0.peso+tree1.peso
-        root= Tree(Codigo(novaLetra, novoPeso), tabela[0], tabela[1])
-        for i in range(2): tabela.pop(0)
-        tabela.append(root)
-        del(tree0)
-        del(tree1)
-        del(novaLetra)
-        del(novoPeso)
-        del(root)
-        tabela = sorted(tabela, key = lambda x: x.codigo.peso)
-    return tabela[0]
-
-def newTabela(palavra):
-    lista=palavra.split(",")
-    tabela=[]
-    soma=0
-    while(len(lista)>0):
-        soma+=int(lista[1])
-        frequencia=Codigo(lista[0], int(lista[1]))
-        tree=Tree(frequencia)
-        tabela.append(tree)
-        del(frequencia)
-        del(tree)
-        for i in range(2): lista.pop(0)
-    for tree in tabela:
-        tree.codigo.peso = tree.codigo.peso/soma
-    return treeHuffman(tabela)
-
-def gerarTabela(tree, lista, top, vector):
-    if(tree.left != None):
-        lista[top]= "0"
-        gerarTabela(tree.left, lista, top+1, vector)
-
-    if(tree.right != None):
-        lista[top]="1"
-        gerarTabela(tree.right, lista, top+1, vector)
+    def printaTabela(self):
+        for tupla in self.tabela:
+            print(tupla)
     
-    if(tree.left == None and tree.right == None):
-        gerarTupla(tree.codigo.letra,lista, top, vector)
+    def gerarEstruturas(self):
+        for tupla in self.tabela:
+            self.compressao[tupla[0]]=tupla[2:]
+            self.descompressao[tupla[2:]]= tupla[0]
 
-def gerarTupla(codigo, caminho, tamanho, vetor):
-    binario=""
-    for i in range(top):
-        binario+=caminho[i]
-    tupla=codigo + " " + binario
-    vetor.append(tupla)
+    def comprimir(self, nomeArquivo):
+        self.analisarFrequencia(nomeArquivo)
+        arquivo=open("Saida/comprimido.txt", "w")
+        saida=""
+        for letra in self.texto:
+            saida+=self.compressao[letra]
+        for tupla in self.tabela:
+            saida += "\n" + tupla
+        arquivo.write(saida)
+        arquivo.close()
 
-def tabelaCodigo():
-    huffmanComp=dict()
-    huffmanDesc=dict()
-    tam=int(input("Insira o tamanho da tabela: "))
-    for i in range(0, tam):
-        letra=input("Insira a letra: ")
-        codigo=input("Insira o respectivo codigo: ")
-        huffmanComp[letra]= codigo
-        huffmanDesc[codigo]=letra
-    opcao=-1
-    while(opcao!=0):
-        print("""
-            1-comprimir
-            2-descomprimir
-
-            0-Sair
-         """)
-        opcao=int(input("Escolha uma opcao: "))
-        if opcao == 1:
-            saida=[]
-            texto=input("Entre com a mensagem: ")
-            for i in texto:
-                saida.append(huffmanComp[i])
-            saida = "".join(saida)
-            print(saida)
-            arquivo=open("comprimir.txt", "w")
-            arquivo.write(saida)
-            arquivo.close()
-        elif(opcao == 2):
-            saida=[]
-            texto=leitura ()
-            palavra=""
-            print(texto)
-            indice=0
-            while(indice < len(texto)):
-                palavra+=texto[indice]
-                if palavra in huffmanDesc:
-                    saida.append(huffmanDesc[palavra])
-                    palavra=""
-                indice+=1
-            saida= "".join(saida)
-            print(saida)
-            arquivo=open("descomprimir.txt", "w")
-            arquivo.write(saida)
-            arquivo.close()
-        else:
-            print("Saindo")
-
-def leitura():
-    nomeTxt = input("Insira o nome do arquivo em txt: ")
-    arquivo=open(nomeTxt)
-    l=arquivo.readlines()
-    print(l)
-    arquivo.close()
-    l="".join(l)
-    return l
-
-def ler():
-    huffmanComp=dict()
-    huffmanDesc=dict()
-    nomeTxt="entrada_top.txt"
-    arquivo= open(nomeTxt)
-    for i,x in enumerate(arquivo.readlines()):
-        if(i == 0):
-            texto=x.split()
-        else:
-            l=x.split()
-            if(len(l)>1):
-                letra=l[1]
-                codigo=l[0]
-                huffmanComp[letra]= codigo
-                huffmanDesc[codigo]=letra
+    def descomprimir(self, nomeArquivo):
+        arquivo=open(nomeArquivo)
+        for i,x in enumerate(arquivo.readlines()):
+            if(i == 0):
+                binario=x.split()
             else:
-                codigo=l[0]
-                huffmanComp[" "]= codigo
-                huffmanDesc[codigo]=" "
-    texto="".join(texto)
-    opcao=-1
-    while(opcao!=0):
-        print("""
-            1-comprimir
-            2-descomprimir
-
-            0-Sair
-         """)
-        opcao=int(input("Escolha uma opcao: "))
-        if opcao == 1:
-            saida=[]
-            for i in texto:
-                saida.append(huffmanComp[i])
-            saida = "".join(saida)
-            print(saida)
-            arquivo=open("comprimir.txt", "w")
-            arquivo.write(saida)
-            arquivo.close()
-        elif(opcao == 2):
-            saida=[]
-            palavra=""
-            indice=0
-            while(indice < len(texto)):
-                palavra+=texto[indice]
-                if palavra in huffmanDesc:
-                    saida.append(huffmanDesc[palavra])
-                    palavra=""
-                indice+=1
-            saida= "".join(saida)
-            print(saida)
-            arquivo=open("descomprimir.txt", "w")
-            arquivo.write(saida)
-            arquivo.close()
-        else:
-            print("Saindo")
-"""
+                linha=x.split()
+                if(len(linha)>1):
+                    letra=linha[0]
+                    codigo=linha[1]
+                    self.descompressao[codigo]=letra
+                else:
+                    codigo=linha[0]
+                    self.descompressao[codigo]=" "
+        binario="".join(binario)
+        arquivo.close()
+        palavra=""
+        saida=[]
+        indice=0
+        while(indice < len(binario)):
+            palavra+=binario[indice]
+            if palavra in self.descompressao:
+                saida.append(self.descompressao[palavra])
+                palavra=""
+            indice+=1
+        saida= "".join(saida)
+        arquivo=open("Saida/descomprimido.txt", "w")
+        arquivo.write(saida)
+        arquivo.close()
