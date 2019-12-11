@@ -1,6 +1,87 @@
 from codigo import Codigo
 from tree import Tree
 
+class Huffman:
+    def __init__(self):
+        self.compressao=dict()
+        self.descompressao=dict()
+        self.tabela=[]
+
+    def analisarFrequencia(self, nomeArquivo):
+        alfabeto=[0]*128
+        arquivo=open(nomeArquivo)
+        texto=arquivo.readlines()
+        arquivo.close()
+        tabelaPeso = []
+        for i in texto:
+            alfabeto[ord(i)] +=1
+        soma=0
+        for i,x in enumerate(alfabeto):
+            if x != 0:
+                frequencia=Codigo(chr(i), x)
+                tree=Tree(frequencia)
+                tabelaPeso.append(tree)
+                del(frequencia)
+                del(tree)
+                soma+=x
+        for tree in tabelaPeso:
+            tree.codigo.peso=tree.codigo.peso/soma
+        root=geraArvore(tabelaPeso)
+        huffman=Huffman()
+        array=[0]*128
+        self.gerarTabela(root, array, 0, huffman.tabela)
+        for x in huffman.tabela:
+            print(x)
+        return huffman
+
+    def geraArvore(self,pesos):
+        pesos = sorted(pesos, key = lambda x: x.codigo.peso)
+        esquerdaMenor=True
+        while(len(pesos)>1):
+            tree0=pesos[0].codigo
+            tree1=pesos[1].codigo
+            if esquerdaMenor:
+                novaLetra= "(" + tree0.letra +  "," +  tree1.letra +  ")"
+                novoPeso=tree0.peso+tree1.peso
+                root= Tree(Codigo(novaLetra, novoPeso), pesos[0], pesos[1])
+                esquerdaMenor=False
+            else:
+                novaLetra= "(" + tree1.letra +  "," +  tree0.letra +  ")"
+                novoPeso=tree0.peso+tree1.peso
+                root= Tree(Codigo(novaLetra, novoPeso), pesos[1], pesos[0])
+                esquerdaMenor=True
+            for i in range(2): pesos.pop(0)
+            pesos.append(root)
+            del(tree0)
+            del(tree1)
+            del(novaLetra)
+            del(novoPeso)
+            del(root)
+            pesos = sorted(pesos, key = lambda x: x.codigo.peso)
+        return pesos[0]
+
+    def gerarTabela(self, tree, lista, top, vector):
+        if(tree.left != None):
+            lista[top]= "0"
+            self.gerarTabela(tree.left, lista, top+1, vector)
+
+        if(tree.right != None):
+            lista[top]="1"
+            self.gerarTabela(tree.right, lista, top+1, vector)
+        
+        if(tree.left == None and tree.right == None):
+            self.gerarTupla(tree.codigo.letra,lista, top, vector)
+
+    def gerarTupla(self,codigo, caminho, tamanho, vetor):
+        binario=""
+        for i in range(top):
+            binario+=caminho[i]
+        tupla=codigo + " " + binario
+        vetor.append(tupla)
+
+huffman= Huffman()
+
+"""
 def compressao(tree, mensagem):
     compressao= ""
     for letra in mensagem:
@@ -102,22 +183,22 @@ def newTabela(palavra):
         tree.codigo.peso = tree.codigo.peso/soma
     return treeHuffman(tabela)
 
-def printarHuffman(tree, lista, top, vector):
+def gerarTabela(tree, lista, top, vector):
     if(tree.left != None):
         lista[top]= "0"
-        printarHuffman(tree.left, lista, top+1, vector)
+        gerarTabela(tree.left, lista, top+1, vector)
 
     if(tree.right != None):
         lista[top]="1"
-        printarHuffman(tree.right, lista, top+1, vector)
+        gerarTabela(tree.right, lista, top+1, vector)
     
     if(tree.left == None and tree.right == None):
-        printArr(tree.codigo.letra,lista, top, vector)
+        gerarTupla(tree.codigo.letra,lista, top, vector)
 
-def printArr(codigo, lista, top, vetor):
+def gerarTupla(codigo, caminho, tamanho, vetor):
     binario=""
     for i in range(top):
-        binario+=lista[i]
+        binario+=caminho[i]
     tupla=codigo + " " + binario
     vetor.append(tupla)
 
@@ -233,3 +314,4 @@ def ler():
             arquivo.close()
         else:
             print("Saindo")
+"""
