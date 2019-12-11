@@ -29,7 +29,6 @@ class Huffman:
         for tree in tabelaPeso:
             tree.codigo.peso=tree.codigo.peso/soma
         root=self.geraArvore(tabelaPeso)
-        huffman=Huffman()
         array=[0]*128
         self.gerarTabela(root, array, 0, self.tabela)
         self.gerarEstruturas()
